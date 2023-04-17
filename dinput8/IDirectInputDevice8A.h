@@ -4,11 +4,102 @@ class m_IDirectInputDevice8A : public IDirectInputDevice8A, public AddressLookup
 {
 private:
 	IDirectInputDevice8A *ProxyInterface;
+	
+	bool userDefined_DeviceGain_Enabled;
+	DIPROPDWORD dip_gain_set;
+
+	bool userDefined_ConstantGain_Enabled;
+	DWORD constant_gain_set;
+
+	bool userDefined_RampGain_Enabled;
+	DWORD ramp_gain_set;
+
+	bool userDefined_SquareGain_Enabled;
+	DWORD square_gain_set;
+
+	bool userDefined_SineGain_Enabled;
+	DWORD sine_gain_set;
+
+	bool userDefined_TriangleGain_Enabled;
+	DWORD triangle_gain_set;
 
 public:
 	m_IDirectInputDevice8A(IDirectInputDevice8A *aOriginal) : ProxyInterface(aOriginal)
 	{
 		ProxyAddressLookupTable.SaveAddress(this, ProxyInterface);
+
+		//Custom device gain
+		{
+			std::ifstream ifs("dinput_device_gain.ini", std::ios_base::in);
+			userDefined_DeviceGain_Enabled = !ifs.bad();
+			if (userDefined_DeviceGain_Enabled)
+			{
+				unsigned int gain;
+				ifs >> gain;
+				ifs.close();
+
+				dip_gain_set.diph.dwSize = sizeof(DIPROPDWORD);
+				dip_gain_set.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+				dip_gain_set.diph.dwObj = 0;
+				dip_gain_set.diph.dwHow = DIPH_DEVICE;
+				dip_gain_set.dwData = gain;
+			}
+		}
+
+		//Custom constant gain
+		{
+			std::ifstream ifs("dinput_constant_gain.ini", std::ios_base::in);
+			userDefined_ConstantGain_Enabled = !ifs.bad();
+			if (userDefined_ConstantGain_Enabled)
+			{
+				ifs >> constant_gain_set;
+				ifs.close();
+			}
+		}
+
+		//Custom ramp gain
+		{
+			std::ifstream ifs("dinput_ramp_gain.ini", std::ios_base::in);
+			userDefined_RampGain_Enabled = !ifs.bad();
+			if (userDefined_RampGain_Enabled)
+			{
+				ifs >> ramp_gain_set;
+				ifs.close();
+			}
+		}
+
+		//Custom square gain
+		{
+			std::ifstream ifs("dinput_square_gain.ini", std::ios_base::in);
+			userDefined_SquareGain_Enabled = !ifs.bad();
+			if (userDefined_SquareGain_Enabled)
+			{
+				ifs >> square_gain_set;
+				ifs.close();
+			}
+		}
+
+		//Custom sine gain
+		{
+			std::ifstream ifs("dinput_sine_gain.ini", std::ios_base::in);
+			userDefined_SineGain_Enabled = !ifs.bad();
+			if (userDefined_SineGain_Enabled)
+			{
+				ifs >> sine_gain_set;
+				ifs.close();
+			}
+		}
+
+		//Custom triangle gain
+		{
+			std::ifstream ifs("dinput_triangle_gain.ini", std::ios_base::in);
+			userDefined_TriangleGain_Enabled = !ifs.bad();
+			if (userDefined_TriangleGain_Enabled)
+			{
+				ifs >> triangle_gain_set;
+				ifs.close();
+			}
+		}
 	}
 	~m_IDirectInputDevice8A()
 	{

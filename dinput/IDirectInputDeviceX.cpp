@@ -130,7 +130,61 @@ HRESULT m_IDirectInputDeviceX::Initialize(HINSTANCE hinst, DWORD dwVersion, REFG
 
 HRESULT m_IDirectInputDeviceX::CreateEffect(REFGUID rguid, LPCDIEFFECT lpeff, LPDIRECTINPUTEFFECT * ppdeff, LPUNKNOWN punkOuter)
 {
-	HRESULT hr = ProxyInterface->CreateEffect(rguid, lpeff, ppdeff, punkOuter);
+	Log() << "CreateEffect";
+
+	DIEFFECT* lpeff_new;
+	memcpy(&lpeff_new, &lpeff, sizeof LPCDIEFFECT);
+
+	switch (rguid.Data1)
+	{
+	case 0x13541C20://GUID_ConstantForce:
+		Log() << "Const";
+		if (userDefined_ConstantGain_Enabled)
+			lpeff_new->dwGain = constant_gain_set;
+		break;
+	case 0x13541C21://GUID_RampForce:
+		Log() << "Ramp";
+		if (userDefined_RampGain_Enabled)
+			lpeff_new->dwGain = ramp_gain_set;
+		break;
+	case 0x13541C22://GUID_Square:
+		Log() << "Square";
+		if (userDefined_SquareGain_Enabled)
+			lpeff_new->dwGain = square_gain_set;
+		break;
+	case 0x13541C23://GUID_Sine:
+		Log() << "Sine";
+		if (userDefined_SineGain_Enabled)
+			lpeff_new->dwGain = sine_gain_set;
+		break;
+	case 0x13541C24://GUID_Triangle:
+		Log() << "Triangle";
+		if (userDefined_TriangleGain_Enabled)
+			lpeff_new->dwGain = triangle_gain_set;
+		break;
+	case 0x13541C25://GUID_SawtoothUp:
+		Log() << "SawtoothUp";
+		break;
+	case 0x13541C26://GUID_SawtoothDown:
+		Log() << "SawtoothDown";
+		break;
+	case 0x13541C27://GUID_Spring:
+		Log() << "Sprint";
+		break;
+	case 0x13541C28://GUID_Damper:
+		Log() << "Damper";
+		break;
+	case 0x13541C29://GUID_Inertia:
+		Log() << "Inertia";
+		break;
+	case 0x13541C2A://GUID_Friction:
+		Log() << "Inertia";
+	case 0x13541C2B://GUID_CustomForce:
+		Log() << "Custom";
+		break;
+	}
+
+	HRESULT hr = ProxyInterface->CreateEffect(rguid, lpeff_new, ppdeff, punkOuter);
 
 	if (SUCCEEDED(hr) && ppdeff)
 	{
